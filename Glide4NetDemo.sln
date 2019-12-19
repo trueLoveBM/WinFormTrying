@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.902
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glide4NetDemo", "Glide4NetDemo\Glide4NetDemo.csproj", "{90287F74-7F1A-418F-B574-D51FBC3DBC0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glide4Net", "Glide4Net\Glide4Net.csproj", "{55C8235A-D707-4009-9E3C-543062A0CBB0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90287F74-7F1A-418F-B574-D51FBC3DBC0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90287F74-7F1A-418F-B574-D51FBC3DBC0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90287F74-7F1A-418F-B574-D51FBC3DBC0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90287F74-7F1A-418F-B574-D51FBC3DBC0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55C8235A-D707-4009-9E3C-543062A0CBB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55C8235A-D707-4009-9E3C-543062A0CBB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55C8235A-D707-4009-9E3C-543062A0CBB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55C8235A-D707-4009-9E3C-543062A0CBB0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ABF35220-8A38-4171-AADE-9DC336ABA082}
+	EndGlobalSection
+EndGlobal
