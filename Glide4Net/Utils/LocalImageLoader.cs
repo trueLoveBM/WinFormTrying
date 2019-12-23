@@ -46,7 +46,7 @@ namespace Glide4Net.Utils
                      if (Glide.NeedThumbnail)
                      {
                          //进行压缩
-                         magick.Quality = 75;
+                         magick.Quality = 50;
                          //进行尺寸调整
                          //magick.Resize(Glide._overrrideWidth, Glide._overrrideHeight);
                          //将图片进行裁剪
@@ -64,7 +64,7 @@ namespace Glide4Net.Utils
                 //判断当前的图片要加载的地址与将要加载的地址是否一致
                 if (Glide._showPicControl.Tag.ToString() != Glide._imgurl)
                 {
-                    Console.WriteLine("目标图与想要加载图不一致,已经返回,");
+                    //Console.WriteLine("目标图与想要加载图不一致,已经返回,");
                     return;
                 }
             }
@@ -123,7 +123,7 @@ namespace Glide4Net.Utils
             //判断当前的图片要加载的地址与将要加载的地址是否一致
             if (Glide._showPicControl.Tag.ToString() != Glide._imgurl)
             {
-                Console.WriteLine("目标图与想要加载图不一致,已经返回,");
+                //Console.WriteLine("目标图与想要加载图不一致,已经返回,");
                 return;
             }
 
@@ -161,7 +161,7 @@ namespace Glide4Net.Utils
                 //判断当前的图片要加载的地址与将要加载的地址是否一致
                 if (Glide._showPicControl.Tag.ToString() != Glide._imgurl)
                 {
-                    Console.WriteLine("目标图与想要加载图不一致,已经返回");
+                    //Console.WriteLine("目标图与想要加载图不一致,已经返回");
                     return;
                 }
                 Glide._showPicControl.Image = errorImage;

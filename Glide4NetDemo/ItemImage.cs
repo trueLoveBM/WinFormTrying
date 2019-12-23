@@ -20,7 +20,11 @@ namespace Glide4NetDemo
 
         public void LoadImage(string url)
         {
-            Glide.With(this.Handle).Load(url).Into(pictureBox1);
+            Glide
+                .With(this.Handle)
+                .Load(url)
+                //.Overrid(80, 80)
+                .Into(pictureBox1);
         }
     }
 }

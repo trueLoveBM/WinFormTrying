@@ -53,6 +53,7 @@ namespace Glide4NetDemo
             {
                 if (this.Control is ItemImage itemImage)
                 {
+                    //Console.WriteLine($"开始显示照片{this.ImageUrl}");
                     itemImage.LoadImage(ImageUrl);
                 }
             }
@@ -200,8 +201,17 @@ namespace Glide4NetDemo
             g.DrawString(text, font, Brushes.Black, rect, format);
             return bmp;
         }
+
         #endregion
 
-       
+        private void btnNextRow_Click(object sender, EventArgs e)
+        {
+            recycleView1.NextRow();
+        }
+
+        private void btnPreRow_Click(object sender, EventArgs e)
+        {
+            recycleView1.PreRow();
+        }
     }
 }

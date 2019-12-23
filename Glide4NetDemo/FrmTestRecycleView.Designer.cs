@@ -31,12 +31,16 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnTest = new System.Windows.Forms.Button();
             this.recycleView1 = new Glide4NetDemo.RecycleView();
+            this.btnNextRow = new System.Windows.Forms.Button();
+            this.btnPreRow = new System.Windows.Forms.Button();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.Controls.Add(this.btnTest);
+            this.flowLayoutPanel1.Controls.Add(this.btnNextRow);
+            this.flowLayoutPanel1.Controls.Add(this.btnPreRow);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
@@ -61,6 +65,26 @@
             this.recycleView1.Size = new System.Drawing.Size(800, 451);
             this.recycleView1.TabIndex = 1;
             // 
+            // btnNextRow
+            // 
+            this.btnNextRow.Location = new System.Drawing.Point(84, 3);
+            this.btnNextRow.Name = "btnNextRow";
+            this.btnNextRow.Size = new System.Drawing.Size(75, 23);
+            this.btnNextRow.TabIndex = 1;
+            this.btnNextRow.Text = "下一行";
+            this.btnNextRow.UseVisualStyleBackColor = true;
+            this.btnNextRow.Click += new System.EventHandler(this.btnNextRow_Click);
+            // 
+            // btnPreRow
+            // 
+            this.btnPreRow.Location = new System.Drawing.Point(165, 3);
+            this.btnPreRow.Name = "btnPreRow";
+            this.btnPreRow.Size = new System.Drawing.Size(75, 23);
+            this.btnPreRow.TabIndex = 2;
+            this.btnPreRow.Text = "上一行";
+            this.btnPreRow.UseVisualStyleBackColor = true;
+            this.btnPreRow.Click += new System.EventHandler(this.btnPreRow_Click);
+            // 
             // FrmTestRecycleView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -81,5 +105,7 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button btnTest;
         private RecycleView recycleView1;
+        private System.Windows.Forms.Button btnNextRow;
+        private System.Windows.Forms.Button btnPreRow;
     }
 }

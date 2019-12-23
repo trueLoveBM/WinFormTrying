@@ -39,6 +39,7 @@
             this.vSBar.Name = "vSBar";
             this.vSBar.Size = new System.Drawing.Size(17, 300);
             this.vSBar.TabIndex = 0;
+            this.vSBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vSbr_Scroll);
             // 
             // flContent
             // 
@@ -47,6 +48,7 @@
             this.flContent.Name = "flContent";
             this.flContent.Size = new System.Drawing.Size(383, 300);
             this.flContent.TabIndex = 1;
+            this.flContent.SizeChanged += new System.EventHandler(this.flContent_SizeChanged);
             // 
             // RecycleView
             // 

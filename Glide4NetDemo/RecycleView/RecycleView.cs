@@ -14,8 +14,6 @@ namespace Glide4NetDemo
 {
     public partial class RecycleView : UserControl
     {
-
-
         #region 私有变量
 
         /// <summary>
@@ -46,9 +44,20 @@ namespace Glide4NetDemo
         private int _MaxRow;
 
         /// <summary>
+        /// 缓存的行数
+        /// </summary>
+        private int CacheRowCount = 2;
+
+        /// <summary>
         /// ViewHolder集合
         /// </summary>
         private List<ViewHolder> _ViewHolderList;
+
+
+        /// <summary>
+        /// 是否局部刷新
+        /// </summary>
+        private bool _GpuTurbu = true;
         #endregion
 
         #region 构造函数
@@ -65,12 +74,16 @@ namespace Glide4NetDemo
             this.vSBar.ValueChanged += VSBar_ValueChanged;
             //初始化监听
             _Stopwatch = new Stopwatch();
+
+            //设置双缓冲 ,防止flowLayoutPanel刷新闪烁问题
+            flContent.GetType().GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(flContent, true, null);
+
+
         }
 
         #endregion
 
         #region 事件
-
         /// <summary>
         /// 内容控件的滚轮事件
         /// </summary>
@@ -89,7 +102,6 @@ namespace Glide4NetDemo
             }
         }
 
-
         /// <summary>
         /// 滚动条的滚动事件
         /// </summary>
@@ -105,17 +117,14 @@ namespace Glide4NetDemo
             //滚动条向下滚动
             if (row > _CurrentRow)
             {
-                Console.WriteLine("开始监听方法下滑");
+
+                Console.WriteLine($"开始监听方法下滑,加载第{row}行数据，最大行数为{_MaxRow}");
                 _Stopwatch.Start();
 
-
+                flContent.Controls.Clear();
 
                 //找到一行控件所属的ViewHolder
                 List<ViewHolder> Firstholders = _ViewHolderList.GetRange(0, _Column);
-
-
-                //挪除第一行
-                Firstholders.ForEach(m => flContent.Controls.Remove(m.Control));
 
                 //挪除ViewHolder
                 _ViewHolderList.RemoveRange(0, _Column);
@@ -124,24 +133,57 @@ namespace Glide4NetDemo
                 _ViewHolderList.InsertRange(_ViewHolderList.Count, Firstholders);
 
 
-                int First = (row - 1) * _Column;
                 //将挪除的第一行加到最后一行
-                for (int i = 0; i < _Column; i++)
+                if (_GpuTurbu)
                 {
-                    //找到那个ViewHolder
-                    var holder = Firstholders[i];
-                    //重新赋值ViewHolder字段
-                    _Adapter.OnBindViewHolder(holder, First + i);
-                    //重新加载该条目的图片
-                    flContent.Controls.Add(Firstholders[i].Control);
-                    //显示该项目
-                    holder.StartLoad();
+                    int First = _CurrentRow * _Column;
+                    for (int i = 0; i < _Column; i++)
+                    {
+                        //找到那个ViewHolder
+                        var holder = Firstholders[i];
+                        //重新赋值ViewHolder字段
+                        int index = First + i;
+                        if (index < _Adapter.GetItemCount())
+                        {
+                            _Adapter.OnBindViewHolder(holder, First + i);
+                            //显示该项目
+                            holder.StartLoad();
+                        }
+                        else
+                        {
+                            holder.Control.Visible = false;
+                        }
+                    }
                 }
+                else
+                {
+                    int First = row * _Column;
+                    for (int i = 0; i < _ViewHolderList.Count; i++)
+                    {
+                        //找到那个ViewHolder
+                        var holder = _ViewHolderList[i];
+                        //重新赋值ViewHolder字段
+                        int index = First + i;
+                        if (index < _Adapter.GetItemCount())
+                        {
+                            _Adapter.OnBindViewHolder(holder, First + i);
+                            //显示该项目
+                            holder.StartLoad();
+                        }
+                        else
+                        {
+                            holder.Control.Visible = false;
+                        }
+                    }
+                    _GpuTurbu = true;
+                }
+
+                flContent.Controls.AddRange(_ViewHolderList.ConvertAll<Control>(m => m.Control).ToArray());
 
                 _CurrentRow = row;
 
                 _Stopwatch.Stop();
-                Console.WriteLine($"下滑加载耗时{_Stopwatch.ElapsedMilliseconds.ToString()}");
+                //Console.WriteLine($"下滑加载耗时{_Stopwatch.ElapsedMilliseconds.ToString()}");
             }
 
 
@@ -151,36 +193,52 @@ namespace Glide4NetDemo
                 Console.WriteLine("开始监听方法上滑");
                 _Stopwatch.Start();
 
+                flContent.Controls.Clear();
+
                 //找到新要显示的一行数据
                 List<ViewHolder> Lastholders = new List<ViewHolder>();
                 for (int i = _Column; i > 0; i--)
                 {
-                    Lastholders.Add(_ViewHolderList.ElementAt(_ViewHolderList.Count - 1 - i));
+                    var holder = _ViewHolderList.ElementAt(_ViewHolderList.Count - 1 - i);
+                    Lastholders.Add(holder);
                 }
 
-                Lastholders.ForEach(m => flContent.Controls.Remove(m.Control));
-
-                //ViewHolderList中删除最后一行
                 _ViewHolderList.RemoveRange(_ViewHolderList.Count - 1 - _Column, _Column);
 
                 //将重新显示的viewholder显示到第一行
                 _ViewHolderList.InsertRange(0, Lastholders);
 
-                int First = (row - _InitRow) * _Column;
-
+                
                 //将挪除的最后一行加到第一行
-                for (int i = 0; i < _Column; i++)
+                if (_GpuTurbu)  //局部刷新
                 {
-                    //重新赋值           (row - y) * x,
-                    _Adapter.OnBindViewHolder(_ViewHolderList[i], First + i);
-                    //重新加载
-                    _ViewHolderList[i].StartLoad();
-
-                    flContent.Controls.Add(_ViewHolderList[i].Control);
-                    flContent.Controls.SetChildIndex(_ViewHolderList[i].Control, i);
+                    int First = (row - _InitRow) * _Column;
+                    for (int i = 0; i < _Column; i++)
+                    {
+                        //重新赋值           (row - y) * x,
+                        _Adapter.OnBindViewHolder(_ViewHolderList[i], First + i);
+                        if (!_ViewHolderList[i].Control.Visible)
+                            _ViewHolderList[i].Control.Visible = true;
+                        //重新加载
+                        _ViewHolderList[i].StartLoad();
+                    }
                 }
-             ;
+                else//整体刷新
+                {
+                    int First = (row - _InitRow) * _Column;
+                    for (int i = 0; i < _ViewHolderList.Count; i++)
+                    {
+                        //重新赋值           (row - y) * x,
+                        _Adapter.OnBindViewHolder(_ViewHolderList[i], First + i);
+                        if (!_ViewHolderList[i].Control.Visible)
+                            _ViewHolderList[i].Control.Visible = true;
+                        //重新加载
+                        _ViewHolderList[i].StartLoad();
+                    }
+                    _GpuTurbu = true;
+                }
 
+                flContent.Controls.AddRange(_ViewHolderList.ConvertAll<Control>(m => m.Control).ToArray());
                 _CurrentRow = row;
 
                 _Stopwatch.Stop();
@@ -188,7 +246,55 @@ namespace Glide4NetDemo
             }
 
             //滑动到指定位置
-            flContent.AutoScrollPosition = new Point(0, row > _InitRow ? row * 100 : 0);
+            flContent.AutoScrollPosition = new Point(0, row > _InitRow ? row * 106 : 0);
+        }
+
+        /// <summary>
+        /// 窗体大小发生改变时
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void flContent_SizeChanged(object sender, EventArgs e)
+        {
+            if (flContent.Width > 0 && flContent.Height > 0)
+            {
+                //记录当前所在的数的位置
+                int CurrentDataIndex = _Column * (_CurrentRow - CacheRowCount);
+
+                _Column = flContent.Width / 106;
+                if (_Column < 1)
+                    _Column = 1;
+                _InitRow = flContent.Height / 100 + CacheRowCount;
+
+                //初始化界面
+                NotifyDataSetChanged();
+
+                //大小改变后，这个数字所在的行数 TODO
+                int newRow = CurrentDataIndex / _Column;
+                vSBar.Value = newRow;
+            }
+        }
+
+        /// <summary>
+        /// 垂直滚动条的滚动事件
+        /// 在滚动结束后，再开始加载项目
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void vSbr_Scroll(object sender, ScrollEventArgs e)
+        {
+            if (e.Type == ScrollEventType.EndScroll)
+            {
+                vSBar.ValueChanged += VSBar_ValueChanged;
+                VSBar_ValueChanged(sender, e);
+            }
+            else
+            {
+                vSBar.ValueChanged -= VSBar_ValueChanged;
+                _GpuTurbu = false;
+
+            }
+            Console.WriteLine($"新的行数{e.NewValue}  旧的行数{e.OldValue}  类型{e.Type}");
         }
         #endregion
 
@@ -211,16 +317,20 @@ namespace Glide4NetDemo
         public void NotifyDataSetChanged()
         {
             if (_Adapter == null)
-                throw new Exception("还未设置适配器");
+                return;
 
             //获取当前可加载的个数
-            _Column = 7;// (int)Math.Floor(flImages.Width / 100f);
-            _InitRow = 7; //(int)Math.Ceiling(flImages.Height / 100f);
             _CurrentRow = _InitRow;
             int maxNum = _Column * _InitRow;
             if (maxNum > _Adapter.GetItemCount())
                 maxNum = _Adapter.GetItemCount();
-            _MaxRow = (int)Math.Ceiling(_Adapter.GetItemCount() * 1f / _Column);
+            _MaxRow = (int)Math.Ceiling(_Adapter.GetItemCount() * 1f / _Column) + 2;
+            vSBar.Maximum = _MaxRow;
+            vSBar.Value = 0;
+
+            //清除旧的子项目
+            flContent.Controls.Clear();
+
 
             _ViewHolderList = new List<ViewHolder>(maxNum - 1);
             //初始化第一次显示的项目，先加载maxNum行数据
@@ -237,10 +347,24 @@ namespace Glide4NetDemo
                 //将ViewHolder存入集合，循环使用
                 _ViewHolderList.Add(viewHolder);
             }
-            //根据最大行数，初始化滚动条的长度
-            vSBar.Maximum = _MaxRow;
         }
 
+
+        /// <summary>
+        /// 下一行
+        /// </summary>
+        public void NextRow()
+        {
+            vSBar.Value++;
+        }
+
+        /// <summary>
+        /// 上一行
+        /// </summary>
+        public void PreRow()
+        {
+            vSBar.Value--;
+        }
         #endregion
 
 
@@ -321,7 +445,6 @@ namespace Glide4NetDemo
             {
                 Control = control;
             }
-
 
             /// <summary>
             /// 加载
